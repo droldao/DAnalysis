@@ -1,4 +1,5 @@
 <?php
+
 echo 'Inicio<hr>';
 
 require_once ('class.decklist.php');
@@ -7,11 +8,6 @@ require_once ('class.decklist.php');
 $arquivo_1 = file_get_contents('database\AllCards-x.json');
 $database = json_decode($arquivo_1);
 $decklist = file('decks\TESTE123.txt');
-
-//echo '<pre>';
-//print_r($database->{'Aven Mindcensor'});
-//echo '</pre>';
-//die('DEBUG');
 
 $deck = new DeckList();
 

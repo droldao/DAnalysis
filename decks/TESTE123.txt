@@ -17,12 +17,133 @@
 3 Tectonic Edge
 1 Akroma, Angel of Wrath
 4 Aether Vial
-
-2 Celestial Purge
-1 Chalice of the Void
-1 Grafdigger's Cage
-3 Kataki, War's Wage
-3 Kor Firewalker
-1 Mark of Asylum
-2 Mirran Crusader
-2 Rest in Peace
+3 Deceiver Exarch
+2 Pestermite
+4 Snapcaster Mage
+2 Tasigur, the Golden Fang
+1 Vendilion Clique
+4 Island
+1 Mountain
+1 Swamp
+1 Blood Crypt
+1 Bloodstained Mire
+1 Desolate Lighthouse
+4 Polluted Delta
+4 Scalding Tarn
+2 Steam Vents
+3 Sulfur Falls
+1 Watery Grave
+4 Splinter Twin
+1 Cryptic Command
+1 Dismember
+1 Dispel
+1 Kolaghan's Command
+4 Lightning Bolt
+4 Remand
+2 Spell Snare
+2 Terminate
+1 Thought Scour
+4 Serum Visions
+4 Cursecatcher
+3 Harbinger of the Tides
+4 Lord of Atlantis
+4 Master of the Pearl Trident
+3 Master of Waves
+3 Merrow Reejerey
+4 Silvergill Adept
+12 Island
+1 Cavern of Souls
+4 Mutavault
+1 Wanderwine Hub
+1 Minamo, School at Water's Edge
+1 Oboro, Palace in the Clouds
+4 Aether Vial
+2 Relic of Progenitus
+4 Spreading Seas
+3 Dismember
+2 Vapor Snag
+4 Wurmcoil Engine
+1 Emrakul, the Aeons Torn
+1 Ulamog, the Infinite Gyre
+4 Karn Liberated
+2 Ugin, the Spirit Dragon
+1 Forest
+1 Ghost Quarter
+4 Grove of the Burnwillows
+1 Karplusan Forest
+4 Urza's Mine
+4 Urza's Power Plant
+4 Urza's Tower
+1 Eye of Ugin
+4 Chromatic Sphere
+4 Chromatic Star
+4 Expedition Map
+2 Oblivion Stone
+4 Ancient Stirrings
+3 Explore
+3 Pyroclasm
+4 Sylvan Scrying
+4 Goblin Guide
+1 Grim Lavamancer
+4 Monastery Swiftspear
+4 Eidolon of the Great Revel
+3 Mountain
+3 Arid Mesa
+3 Bloodstained Mire
+2 Sacred Foundry
+2 Scalding Tarn
+2 Stomping Ground
+4 Wooded Foothills
+4 Atarka's Command
+4 Boros Charm
+4 Lightning Bolt
+2 Lightning Helix
+4 Searing Blaze
+2 Shard Volley
+1 Skullcrack
+4 Lava Spike
+3 Rift Bolt
+4 Arcbound Ravager
+3 Etched Champion
+1 Hangarback Walker
+1 Master of Etherium
+3 Memnite
+4 Ornithopter
+4 Signal Pest
+2 Steel Overseer
+4 Vault Skirge
+4 Darksteel Citadel
+1 Mountain
+4 Blinkmoth Nexus
+3 City of Brass
+4 Inkmoth Nexus
+4 Cranial Plating
+4 Springleaf Drum
+4 Galvanic Blast
+2 Shrapnel Blast
+4 Mox Opal
+2 Gurmag Angler
+4 Snapcaster Mage
+2 Tasigur, the Golden Fang
+1 Vendilion Clique
+3 Island
+1 Mountain
+1 Swamp
+1 Blood Crypt
+2 Creeping Tar Pit
+4 Polluted Delta
+4 Scalding Tarn
+2 Steam Vents
+2 Sulfur Falls
+2 Watery Grave
+3 Cryptic Command
+1 Dispel
+3 Kolaghan's Command
+4 Lightning Bolt
+2 Mana Leak
+1 Remand
+2 Spell Snare
+4 Terminate
+4 Thought Scour
+4 Serum Visions
+1 Thoughtseize
