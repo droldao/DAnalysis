@@ -47,11 +47,11 @@ class Card {
     $this->text_adaptation();
 
     if ($this->is_creature) {
-      $this->find_abilities();
+//      $this->find_abilities();
 
       if (!empty($this->text)) {
         echo '<hr>';
-        var_dump($this->text);
+        print_r($this->text);
         echo '</pre>';
       }
     }
@@ -143,7 +143,21 @@ class Card {
 
   public function find_trigger($matches) {
     $trigger_name = $matches[0];
+
     $this->abilities['trigger'][] = $trigger_name;
+
+    if (substr($trigger_name, -1) !== '.') {
+      $triggers_search = '/~([^\n]+)/';
+
+      $this->text = trim(preg_replace_callback($triggers_search, [$this, 'find_choose'], $this->text));
+    }
+
+    return '';
+  }
+
+  public function find_choose($matches) {
+    $options = $matches[0];
+    $this->abilities['options'][] = $options;
     return '';
   }
 

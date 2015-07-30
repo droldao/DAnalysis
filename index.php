@@ -1,11 +1,13 @@
 <?php
 
+header('Content-Type: text/html; charset=utf-8');
+
 echo 'Inicio<hr>';
 
 require_once ('class.decklist.php');
 
 
-$arquivo_1 = file_get_contents('database\AllCards-x.json');
+$arquivo_1 = str_replace('•', '~', file_get_contents('database\AllCards-x.json'));
 $database = json_decode($arquivo_1);
 $decklist = file('decks\TESTE123.txt');
 
