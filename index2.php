@@ -14,7 +14,7 @@ $tipos = array();
 foreach ($all_names as $nome) {
   $card_dados = $dados->$nome;
 
-  if ($card_dados->legalities->Modern != 'Legal') {
+  if (isset($card_dados->legalities->Modern) && $card_dados->legalities->Modern != 'Legal') {
     continue;
   }
   if (!in_array('Creature', $card_dados->types)) {
@@ -23,18 +23,17 @@ foreach ($all_names as $nome) {
 
   while (($pos_inicio_reminder = strpos($card_dados->text, '(')) !== false) {
     $pos_fim_reminder = strpos($card_dados->text, ')', $pos_inicio_reminder);
-    $texto_reminder = substr($card_dados->text, $pos_inicio_reminder, $pos_fim_reminder+1-$pos_inicio_reminder);
+    $texto_reminder = substr($card_dados->text, $pos_inicio_reminder, $pos_fim_reminder + 1 - $pos_inicio_reminder);
 
-    $card_dados->text = substr_replace($card_dados->text, '', $pos_inicio_reminder, $pos_fim_reminder+1-$pos_inicio_reminder);
+    $card_dados->text = substr_replace($card_dados->text, '', $pos_inicio_reminder, $pos_fim_reminder + 1 - $pos_inicio_reminder);
     $key_word = substr($card_dados->text, 0, $pos_inicio_reminder);
-    echo '<pre><hr>'.$key_word. '<br>';
-print_r($texto_reminder);
-echo '</pre>';
-
+    echo '<pre><hr>' . $key_word . '<br>';
+    print_r($texto_reminder);
+    echo '</pre>';
   }
 
   $card_dados->text = trim($card_dados->text);
-  
+
   $tipos = array_merge($tipos, $card_dados->subtypes);
   $tipos = array_unique($tipos);
 }

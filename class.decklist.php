@@ -28,6 +28,38 @@ class CardListed {
 }
 
 class Card {
+  public $keywords = [];
+  public $additional_cost = [];
+
+  public function __construct($card_obj) {
+    foreach (get_object_vars($card_obj) as $campo => $valor) {
+      $this->$campo = $valor;
+    }
+
+    if (!isset($this->text)) {
+      $this->text = '';
+    }
+
+    $this->replaceNameOnText();
+  }
+
+  public function replaceNameOnText() {
+    $name_src = [$this->name.'\'s', $this->name];
+    $surname = trim(substr($this->name, 0, strpos($this->name, ',')));
+    if (!empty($surname)) {
+      $name_src[] = $surname;
+    }
+
+    if (strpos($this->text, 'named '.$this->name)){
+      die('ERRO CARD POSSUI NAMED THIS');
+    }
+    $this->text = str_replace($name_src, '$', $this->text);
+  }
+}
+
+
+/*
+class Card {
 
   public $abilities = ['keyword' => [], 'trigger' => [], 'static' => [], 'actived' => []];
   public $protections = ['protection from black and from red', 'protection from red', 'protection from colored spells'];
@@ -168,3 +200,4 @@ class Card {
   }
 
 }
+ */
