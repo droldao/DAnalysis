@@ -30,6 +30,7 @@ class CardListed {
 class Card {
   public $keywords = [];
   public $additional_cost = [];
+  public $trigger = [];
 
   public function __construct($card_obj) {
     foreach (get_object_vars($card_obj) as $campo => $valor) {
