@@ -1,19 +1,30 @@
 <?php
 header('Content-Type: text/html; charset=utf-8');
 
+define("EM_DASH", "[");
+define("BULLET", "]");
+define("AE", "Ae");
+
+define("CHR_EOL", 10);
+define("CHR_CR", 13);
+define("CHR_COMMA", 44);
+/*
+$opts = array('http' => array('header' => 'Accept-Charset: UTF-8, *;q=0'));
+$context = stream_context_create($opts);
+file_get_contents('database\AllCards-x.json', false, $context)
+ */
+
 echo 'Inicio<hr>';
 
 require_once ('class.decklist.php');
 
-
 $creature_type_list   = json_decode(file_get_contents('database\creature_types.json'));
 $keyword_ability_list = json_decode(file_get_contents('database\keyword_abilities.json'));
 
-$arquivo = str_replace('Æ', 'Ae', file_get_contents('database\AllCards-x.json'));
+$arquivo = str_replace(['Æ', '—', '•'], [AE, EM_DASH, BULLET], file_get_contents('database\AllCards-x.json'));
 //$arquivo = file_get_contents('database\AllCards-x.json');
 $arquivo = trim(preg_replace(['/\s\(([^()]+)\)/i', '/\(([^()]+)\)/i'], '', $arquivo));
 $database = json_decode($arquivo);
-
 
 //$arquivo = str_replace([utf8_encode(chr(198))], ['Ae'], file_get_contents('database\AllCards-x.json'));
 //$decklist = file('decks\HugeElfBoy_8461535.txt');
@@ -51,23 +62,41 @@ foreach ($deck->maindeck as $listed_card) {
       $tam = strlen($keyword_ability->name);
       if (substr($text, 0, $tam) == $keyword_ability->name) {
         $next_chr = ord(substr($text, $tam, 1));
-        if ($keyword_ability->value && $next_chr == ord(' ')) {
-          die('CASO 1.1');
-        } else if ($keyword_ability->cost && $next_chr == ord(' ')) {
-          die('CASO 1.2');
-        } else if (($keyword_ability->cost || $keyword_ability->value) || (!empty(trim(substr($text, $tam))) && !in_array($next_chr, [10, 13, 44]))) {
+        if (!empty($keyword_ability->type) && $next_chr == ord(' ')) {
+          $text = trim(substr($text, $tam));
+
+          if ($keyword_ability->type == 'delete') {
+            $text = trim(substr($text, 2));
+            $achou = true;
+            break;
+          }
+
+          // O que vier primeiro
+          $come_first = ([strpos($text, CHR_EOL), strpos($text, CHR_CR), strpos($text, CHR_COMMA), strlen($text)]);
+          $come_first = array_filter($come_first);
+          sort($come_first);
+          $max = $come_first[0];
+          $key_word_det = substr($text, 0, $max);
+          $text = trim(substr($text, $max + 1));
+
+          $listed_card->card->keyword[] = [$keyword_ability->name => $key_word_det];
+
+          $achou = true;
+          break;
+        } else if (!empty($keyword_ability->type) || (!empty(trim(substr($text, $tam))) && !in_array($next_chr, [CHR_EOL, CHR_CR, CHR_COMMA]))) {
+          die('ERRO - 1.1');
           continue;
-        } //echo ' - ACHOU!!';
+        } else {
+          $listed_card->card->keyword[] = $keyword_ability->name;
 
-        $listed_card->card->keyword[] = $keyword_ability->name;
+          $text = trim(substr($text, $tam));
 
-        $achou = true;
-        $text = trim(substr($text, $tam));
-
-        if (!empty($text) && ord($text[0]) == 44) { //Quebras de linha ou virgula
-          $text = trim(substr($text, 1));
+          if (!empty($text) && ord($text[0]) == CHR_COMMA) { //Quebras de linha ou virgula
+            $text = trim(substr($text, 1));
+          }
+          $achou = true;
+          break;
         }
-        break;
       }
     }
 
@@ -84,10 +113,11 @@ foreach ($deck->maindeck as $listed_card) {
         if (substr($text, 0, $tam) == $castto . ', ') {
           $castto_found = $castto;
           $text = trim(substr($text, $tam));
+          break;
         }
       }
       if (empty($castto_found)) {
-        die('CASO 2.1');
+        die('ERRO - CASO 2.1');
       }
       $fim = strpos($text, '.');
       $custo_adicional = substr($text, 0, $fim);
@@ -96,51 +126,149 @@ foreach ($deck->maindeck as $listed_card) {
       continue;
     }
 
-    foreach (['when', 'whenever', 'as'] as $trigger_text) {
-      $tam = strlen($trigger_text) + 1;
-      if (substr($text, 0, $tam) == $trigger_text . ' ') {
+    foreach (['when', 'whenever', 'as', 'if'] as $trigger_text) {
+      if (substr($text, 0, (strlen($trigger_text) + 1)) == $trigger_text . ' ') {
         $achou = true;
         $condition = substr($text, 0, strpos($text, ','));
         $text = trim(substr($text, strlen($condition) + 1));
 
         $search = 'choose one';
 
-        $tam = strlen($search) + 1;
-
-        if (substr($text, 0, $tam) == $search . ' ' && ord($text[$tam]) == 226) {
-          $text = substr($text, strlen($search) + 2);
-          echo '<pre>';
-          print_r($text);
-          echo '</pre>';
-          die('DEBUG');
-          die('CASO 3.1');
+        if (substr($text, 0, (strlen($search) + 2)) == $search . ' ' . EM_DASH) {
+          $text = substr($text, strlen($search) + 3);
+          $effects = [];
+          while (!empty($text) && $text[0] == BULLET) {
+            $effect = trim(substr($text, 1, strpos($text, '.')));
+            $text = trim(substr($text, strlen($effect) + 2));
+            $effects[] = $effect;
+          }
+          $listed_card->card->trigger[$condition] = $effects;
         } else {
           $effect = substr($text, 0, strpos($text, '.'));
           $text = substr($text, strlen($effect) + 1);
           if ($text[0] == ' ') {
-            $effect_pos = substr($text, 0, strpos($text, '.'));
-            $listed_card->card->trigger[$condition] = [$effect, $effect_pos];
+            $effect_pos = substr($text, 1, strpos($text, '.'));
             $text = substr($text, strlen($effect_pos) + 1);
             if ($text[0] == ' ') {
-              echo '<pre>';
-              var_dump($text);
-              echo '</pre>';
-              die('DEBUG');
-              die('CASO 3.2');
+              $effect_cond_pos = substr($text, 1, strpos($text, '.'));
+              $text = substr($text, strlen($effect_cond_pos) + 1);
+              $effect_pos .= $effect_cond_pos;
+              if ($text[0] == ' ') {
+                die('ERRO - CASO 3.1');
+              }
             }
+            $listed_card->card->trigger[$condition] = [$effect, $effect_pos];
           } else {
             $text = trim($text);
             $listed_card->card->trigger[$condition] = $effect;
           }
-
-
-          continue;
+          $achou = true;
+          break;
         }
       }
     }
 
     if ($achou) { continue; }
 
+    foreach (['you', 'your opponents', 'players'] as $trigger_text) {
+      if (substr($text, 0, (strlen($trigger_text) + 1)) == $trigger_text . ' ') {
+        foreach (['can', 'can\'t', 'may'] as $trigger_cond) {
+          if (substr($text, (strlen($trigger_text) + 1), (strlen($trigger_cond) + 1)) == $trigger_cond . ' ') {
+            $trigger_cond_found = $trigger_text.' '.$trigger_cond;
+          }
+        }
+        if (empty($trigger_cond_found)) {
+          die('ERRO - CASO 4.1');
+        }
+
+        $text = trim(substr($text, strlen($trigger_cond_found) + 1));
+        $effect = substr($text, 0, strpos($text, '.'));
+        $text = substr($text, strlen($effect) + 1);
+
+        if ($text[0] == ' ') {
+          $effect_pos = substr($text, 1, strpos($text, '.'));
+          $text = substr($text, strlen($effect_pos) + 1);
+          if ($text[0] == ' ') {
+            $effect_cond_pos = substr($text, 1, strpos($text, '.'));
+            $text = substr($text, strlen($effect_cond_pos) + 1);
+            $effect_pos .= $effect_cond_pos;
+            if ($text[0] == ' ') {
+              die('ERRO - CASO 4.1');
+            }
+          }
+          $listed_card->card->static[$trigger_cond_found] = [$effect, $effect_pos];
+        } else {
+          $text = trim($text);
+          $listed_card->card->static[$trigger_cond_found] = $effect;
+        }
+        $achou = true;
+        break;
+      }
+    }
+
+
+    if ($achou) { continue; }
+
+    $come_first = ([strpos($text, CHR_EOL), strpos($text, CHR_CR), strlen($text), strpos($text, ':')]);
+    $come_first = array_filter($come_first);
+    sort($come_first);
+    $busca = $come_first[0];
+    if ($busca == strpos($text,':')) {
+      $custo = substr($text, 0, $busca);
+      $text = trim(substr($text, strlen($custo) + 2));
+      $effect = substr($text, 0, strpos($text, '.'));
+      $text = substr($text, strlen($effect) + 1);
+
+      if ($text[0] == ' ') {
+        $effect_pos = substr($text, 1, strpos($text, '.'));
+        $text = substr($text, strlen($effect_pos) + 1);
+        if ($text[0] == ' ') {
+          $effect_cond_pos = substr($text, 1, strpos($text, '.'));
+          $text = substr($text, strlen($effect_cond_pos) + 1);
+          $effect_pos .= $effect_cond_pos;
+          if ($text[0] == ' ') {
+            die('ERRO - CASO 5.1');
+          }
+        }
+        $listed_card->card->activated[$custo] = [$effect, $effect_pos];
+      } else {
+        $text = trim($text);
+        $listed_card->card->activated[$custo] = $effect;
+      }
+      $achou = true;
+    }
+
+    if ($achou) { continue; }
+
+    $come_first = ([strpos($text, CHR_EOL), strpos($text, CHR_CR), strlen($text), strpos($text, ' have'), strpos($text, ' cost'), strpos($text, ' get')]);
+    $come_first = array_filter($come_first);
+    sort($come_first);
+    $busca = $come_first[0];
+
+    if (in_array($busca, [strpos($text, ' have '), strpos($text, ' cost '), strpos($text, ' get ')])) {
+      $grupo_afetado = substr($text, 0, $busca);
+      $text = trim(substr($text, strlen($grupo_afetado)));
+      $effect = substr($text, 0, strpos($text, '.'));
+      $text = trim(substr($text, strlen($effect) + 1));
+      $listed_card->card->static[$grupo_afetado] = $effect;
+      $achou = true;
+    }
+
+
+    if ($achou) { continue; }
+
+    if ($text[0] == '$') {
+      $text = trim(substr($text, 2));
+      $effect = substr($text, 0, strpos($text, '.'));
+      $text = trim(substr($text, strlen($effect) + 1));
+
+      $listed_card->card->static['$'][] = $effect;
+      $achou = true;
+    }
+
+    if ($achou) { continue; }
+
+//    break;
     echo '<pre>';
     echo '<b>'.$listed_card->card->name.'</b><br>';
     print_r($text);
@@ -148,6 +276,14 @@ foreach ($deck->maindeck as $listed_card) {
     break;
   }
 }
-
-
+//die('<br>FIM');
+foreach ($deck->maindeck as $listed_card) {
+  echo '<b>'.$listed_card->card->name.'</b><br>';
+  echo '<pre>';
+  print_r($listed_card->card->keyword);
+  print_r($listed_card->card->additional_cost);
+  print_r($listed_card->card->trigger);
+  print_r($listed_card->card->static);
+  echo '</pre>';
+}
 die('<br>FIM');

@@ -1,22 +1,29 @@
 <?php
 header('Content-Type: text/html; charset=utf-8');
 
+define("EM_DASH", "[");
+
 $ability_list = [];
 
-$ability_list[] = new KeywordAbility('flying',         KeywordAbility::STATIC_ABILITY);
-$ability_list[] = new KeywordAbility('vigilance',      KeywordAbility::STATIC_ABILITY);
-$ability_list[] = new KeywordAbility('flash',          KeywordAbility::STATIC_ABILITY);
-$ability_list[] = new KeywordAbility('first strike',   KeywordAbility::STATIC_ABILITY);
-$ability_list[] = new KeywordAbility('trample',        KeywordAbility::STATIC_ABILITY);
-$ability_list[] = new KeywordAbility('delve',          KeywordAbility::STATIC_ABILITY);
-$ability_list[] = new KeywordAbility('deathtouch',     KeywordAbility::STATIC_ABILITY);
-$ability_list[] = new KeywordAbility('lifelink',       KeywordAbility::STATIC_ABILITY);
-$ability_list[] = new KeywordAbility('haste',          KeywordAbility::STATIC_ABILITY);
-$ability_list[] = new KeywordAbility('prowess',        KeywordAbility::TRIGGER_ABILITY);
-$ability_list[] = new KeywordAbility('indestructible', KeywordAbility::STATIC_ABILITY);
-$ability_list[] = new KeywordAbility('battle cry',     KeywordAbility::TRIGGER_ABILITY);
-$ability_list[] = new KeywordAbility('annihilator',    KeywordAbility::TRIGGER_ABILITY, true);
-$ability_list[] = new KeywordAbility('modular',        KeywordAbility::TRIGGER_ABILITY, true); //também STATIC_ABILITY?????
+$ability_list[] = new KeywordAbility('flying');
+$ability_list[] = new KeywordAbility('vigilance');
+$ability_list[] = new KeywordAbility('flash');
+$ability_list[] = new KeywordAbility('first strike');
+$ability_list[] = new KeywordAbility('trample');
+$ability_list[] = new KeywordAbility('delve');
+$ability_list[] = new KeywordAbility('deathtouch');
+$ability_list[] = new KeywordAbility('lifelink');
+$ability_list[] = new KeywordAbility('haste');
+$ability_list[] = new KeywordAbility('prowess');
+$ability_list[] = new KeywordAbility('indestructible');
+$ability_list[] = new KeywordAbility('battle cry');
+$ability_list[] = new KeywordAbility('annihilator', KeywordAbility::KEYWORD_WITH_VALUE);
+$ability_list[] = new KeywordAbility('modular', KeywordAbility::KEYWORD_WITH_VALUE);
+$ability_list[] = new KeywordAbility('protection', KeywordAbility::KEYWORD_WITH_OBJECT, 'from');
+$ability_list[] = new KeywordAbility('affinity',   KeywordAbility::KEYWORD_WITH_OBJECT, 'for');
+
+$ability_list[] = new KeywordAbility('metalcraft', KeywordAbility::KEYWORD_DELETE);
+$ability_list[] = new KeywordAbility('threshold',  KeywordAbility::KEYWORD_DELETE);
 
 $database = json_encode($ability_list);
 
@@ -26,21 +33,20 @@ fclose($fp);
 
 class KeywordAbility {
 
-  CONST TRIGGER_ABILITY = 'trigger';
-  CONST ACTIVATED_ABILITY = 'activated';
-  CONST STATIC_ABILITY = 'static';
+  CONST KEYWORD_WITH_COST = 'cost';
+  CONST KEYWORD_WITH_VALUE = 'value';
+  CONST KEYWORD_WITH_OBJECT = 'object';
+  CONST KEYWORD_DELETE = 'delete';
 
   public $name;
   public $type;
-  public $value;
-  public $cost;
-  public $reminder = '';
+  public $multi;
 
-  public function __construct($name, $type, $value = false, $cost = false) {
+  public function __construct($name, $type = null, $key = '', $multi = false) {
     $this->name = $name;
     $this->type = $type;
-    $this->value = $value;
-    $this->cost = $cost;
+    $this->key  = $key;
+    $this->multi = $multi;
   }
 }
 

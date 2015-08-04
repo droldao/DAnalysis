@@ -28,9 +28,11 @@ class CardListed {
 }
 
 class Card {
-  public $keywords = [];
   public $additional_cost = [];
+  public $keyword = [];
   public $trigger = [];
+  public $static = [];
+  public $activated  = [];
 
   public function __construct($card_obj) {
     foreach (get_object_vars($card_obj) as $campo => $valor) {
@@ -39,6 +41,8 @@ class Card {
 
     if (!isset($this->text)) {
       $this->text = '';
+    } else {
+      $this->text = trim(preg_replace(['/\s\(([^()]+)\)/i', '/\(([^()]+)\)/i'], '', $this->text));
     }
 
     $this->replaceNameOnText();
