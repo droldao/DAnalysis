@@ -148,3 +148,5 @@
 4 Serum Visions
 1 Thoughtseize
 1 Hooded Assassin
+1 Surrak Dragonclaw
+1 Phantasmal Image

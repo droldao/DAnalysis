@@ -33,6 +33,7 @@ class Card {
   public $trigger = [];
   public $static = [];
   public $activated  = [];
+  public $add_abilities = [];
 
   public function __construct($card_obj) {
     foreach (get_object_vars($card_obj) as $campo => $valor) {
@@ -42,23 +43,49 @@ class Card {
     if (!isset($this->text)) {
       $this->text = '';
     } else {
-      $this->text = trim(preg_replace(['/\s\(([^()]+)\)/i', '/\(([^()]+)\)/i'], '', $this->text));
+      $this->remove_reminder_text();
+      $this->replace_name_on_text();
+      $this->replace_add_abilities();
     }
 
-    $this->replaceNameOnText();
   }
 
-  public function replaceNameOnText() {
+  public function remove_reminder_text() {
+    $ini = strpos($this->text, '(');
+
+    if ($ini !== false) {
+      $end = strpos($this->text, ')');
+      $reminder = substr($this->text, $ini, $end - $ini + 1);
+      $this->text = str_replace([' '.$reminder, $reminder], '', $this->text);
+      $this->remove_reminder_text();
+    }
+//    $this->text = trim(preg_replace(['/\s\(([^()]+)\)/i', '/\(([^()]+)\)/i'], '', $this->text));
+  }
+
+  public function replace_name_on_text() {
     $name_src = [$this->name.'\'s', $this->name];
     $surname = trim(substr($this->name, 0, strpos($this->name, ',')));
     if (!empty($surname)) {
       $name_src[] = $surname;
     }
 
-    if (strpos($this->text, 'named '.$this->name)){
-      die('ERRO CARD POSSUI NAMED THIS');
-    }
+//    if (strpos($this->text, 'named '.$this->name)){
+//      die('ERRO CARD POSSUI NAMED THIS');
+//    }
     $this->text = str_replace($name_src, '$', $this->text);
+  }
+
+  public function replace_add_abilities() {
+    $ini = strpos($this->text, '"');
+
+    if ($ini !== false) {
+      $end = strpos($this->text, '"', $ini + 1);
+      $ability = substr($this->text, $ini, $end - $ini + 1);
+      $seq = count($this->add_abilities) + 1;
+      $this->text = str_replace($ability, '%'.$seq, $this->text);
+      $this->add_abilities[$seq] = $ability;
+      $this->replace_add_abilities();
+    }
   }
 }
 
